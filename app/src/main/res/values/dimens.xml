@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="vertical_bias">0.2</dimen>
+    <dimen name="vertical_bias_of_data">0.3</dimen>
+    <dimen name="vertical_bias_of_number">0.4</dimen>
 </resources>

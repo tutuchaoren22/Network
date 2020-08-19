@@ -8,14 +8,25 @@
 
     <Button
         android:id="@+id/get_data"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/get_data"
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="@id/get_number"
+        app:layout_constraintRight_toRightOf="@id/get_number"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="@dimen/vertical_bias_of_data" />
+    <Button
+        android:id="@+id/get_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/get_number"
         android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="@dimen/vertical_bias" />
+        app:layout_constraintVertical_bias="@dimen/vertical_bias_of_number" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

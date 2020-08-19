@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Network</string>
     <string name="get_data">Get Data Use OkHttp</string>
+    <string name="get_number">Get Number of Launch</string>
 </resources>
