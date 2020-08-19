@@ -1,6 +1,7 @@
 package com.duyuqian.network;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 
@@ -14,4 +15,7 @@ public interface PersonDao {
 
     @Insert
     void insertAll(Person... person);
+
+    @Delete
+    void deleteAll(List<Person> personList);
 }

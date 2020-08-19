@@ -5,7 +5,7 @@ import android.app.Application;
 import androidx.room.Room;
 
 public class MyApplication extends Application {
-    public LocalDataSource localDataSource;
+    public static LocalDataSource localDataSource;
 
     @Override
     public void onCreate() {

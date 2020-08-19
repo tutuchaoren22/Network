@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -14,7 +13,9 @@ import com.google.gson.Gson;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.List;
 
+import butterknife.BindString;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import okhttp3.Call;
@@ -27,20 +28,14 @@ public class MainActivity extends AppCompatActivity {
     public static String URL = "https://twc-android-bootcamp.github.io/fake-data/data/default.json";
     public static int DEFAULT_VALUE = 0;
     OkHttpClient okHttpClient = new OkHttpClient();
-    Toast toast;
+    Gson gson = new Gson();
     Request request;
     Wrapper wrapper;
-    Gson gson = new Gson();
     SharedPreferences sharedPref;
+    LocalDataSource database = new MyApplication().getLocalDataSource();
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
-        updateNumberLaunch(getNumberLaunch() + 1);
-    }
-
+    @BindString(R.string.counts)
+    String countsOfLaunch;
 
     @OnClick({R.id.get_data, R.id.get_number})
     public void onClick(Button button) {
@@ -49,12 +44,19 @@ public class MainActivity extends AppCompatActivity {
                 getDataFromURL(URL);
                 break;
             case R.id.get_number:
-                showToast(toast, String.valueOf(getNumberLaunch()));
+                showToast(String.valueOf(getNumberLaunch()));
                 break;
             default:
         }
     }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+        updateNumberLaunch(getNumberLaunch() + 1);
+    }
 
     public void getDataFromURL(String url) {
         request = new Request.Builder()
@@ -65,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
                 new Callback() {
                     @Override
                     public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                        showToast(toast, "failed");
+                        showToast(e.getMessage());
                     }
 
                     @Override
@@ -76,9 +78,8 @@ public class MainActivity extends AppCompatActivity {
                             updateDataBase();
                             runOnUiThread(() -> {
                                 if (wrapper.getData().size() > 0) {
-                                    showToast(toast, wrapper.getData().get(0).getName());
+                                    showToast(wrapper.getData().get(0).getName());
                                 }
-
                             });
                         }
                     }
@@ -86,33 +87,31 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
-    public void showToast(Toast toast, String content) {
-        if (toast == null) {
-            toast = Toast.makeText(this, content, Toast.LENGTH_SHORT);
-        } else {
-            toast.setText(content);
-        }
+    public void showToast(String content) {
+        Toast toast = Toast.makeText(this, content, Toast.LENGTH_SHORT);
+        toast.setText(content);
         toast.show();
     }
 
     public void updateDataBase() {
-        LocalDataSource database = new MyApplication().getLocalDataSource();
-        for (Person person : wrapper.getData()) {
-            database.personDao().insertAll(person);
+        List<Person> personList = database.personDao().getAll();
+        if (personList.size() != wrapper.getData().size()) {
+            for (Person person : wrapper.getData()) {
+                database.personDao().insertAll(person);
+            }
         }
     }
 
     public int getNumberLaunch() {
         sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        int counts = sharedPref.getInt("counts", DEFAULT_VALUE);
-        return counts;
+        return sharedPref.getInt(countsOfLaunch, DEFAULT_VALUE);
     }
 
     public void updateNumberLaunch(int numberOfLaunchApp) {
         sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt("counts", numberOfLaunchApp);
-        editor.commit();
+        editor.putInt(countsOfLaunch, numberOfLaunchApp);
+        editor.apply();
     }
 
 }
