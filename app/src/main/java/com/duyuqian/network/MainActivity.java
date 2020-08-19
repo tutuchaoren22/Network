@@ -1,8 +1,11 @@
 package com.duyuqian.network;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -10,6 +13,7 @@ import com.google.gson.Gson;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -32,6 +36,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        AsyncTask.execute(() ->
+                getDataFromDataBase());
     }
 
 
@@ -84,4 +91,10 @@ public class MainActivity extends AppCompatActivity {
         toast.show();
     }
 
+    public void getDataFromDataBase() {
+        LocalDataSource database = Room.databaseBuilder(getApplicationContext(),
+                LocalDataSource.class, "dataBase")
+                .build();
+        List<Person> personList = database.personDao().getAll();
+    }
 }

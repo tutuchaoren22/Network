@@ -1,10 +1,14 @@
 package com.duyuqian.network;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 @Entity
 public class Person {
+    @NonNull
+    @PrimaryKey
     @ColumnInfo(name = "name")
     private String name;
     @ColumnInfo(name = "avatar")
