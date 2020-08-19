@@ -2,7 +2,11 @@ package com.duyuqian.network;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -10,7 +14,6 @@ import com.google.gson.Gson;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -22,23 +25,34 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
     public static String URL = "https://twc-android-bootcamp.github.io/fake-data/data/default.json";
+    public static int DEFAULT_VALUE = 0;
     OkHttpClient okHttpClient = new OkHttpClient();
     Toast toast;
     Request request;
     Wrapper wrapper;
     Gson gson = new Gson();
+    SharedPreferences sharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        updateNumberLaunch(getNumberLaunch() + 1);
     }
 
 
-    @OnClick(R.id.get_data)
-    public void onClick() {
-        getDataFromURL(URL);
+    @OnClick({R.id.get_data, R.id.get_number})
+    public void onClick(Button button) {
+        switch (button.getId()) {
+            case R.id.get_data:
+                getDataFromURL(URL);
+                break;
+            case R.id.get_number:
+                showToast(toast, String.valueOf(getNumberLaunch()));
+                break;
+            default:
+        }
     }
 
 
@@ -87,4 +101,18 @@ public class MainActivity extends AppCompatActivity {
             database.personDao().insertAll(person);
         }
     }
+
+    public int getNumberLaunch() {
+        sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        int counts = sharedPref.getInt("counts", DEFAULT_VALUE);
+        return counts;
+    }
+
+    public void updateNumberLaunch(int numberOfLaunchApp) {
+        sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt("counts", numberOfLaunchApp);
+        editor.commit();
+    }
+
 }
