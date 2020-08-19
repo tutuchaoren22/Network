@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -22,6 +24,8 @@ public class MainActivity extends AppCompatActivity {
     OkHttpClient okHttpClient = new OkHttpClient();
     Toast toast;
     Request request;
+    Wrapper wrapper;
+    Gson gson = new Gson();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void getDataFromURL(String url) {
+    public Wrapper getDataFromURL(String url) {
         request = new Request.Builder()
                 .url(url)
                 .build();
@@ -53,16 +57,22 @@ public class MainActivity extends AppCompatActivity {
                     public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                         if (response.isSuccessful()) {
                             final String result = response.body().string();
+                            wrapper = gson.fromJson(result, Wrapper.class);
+
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    showToast(toast, result);
+                                    if (wrapper.getData().size() > 0) {
+                                        showToast(toast, wrapper.getData().get(0).getName());
+                                    }
+
                                 }
                             });
                         }
                     }
                 }
         );
+        return wrapper;
     }
 
     public void showToast(Toast toast, String content) {
