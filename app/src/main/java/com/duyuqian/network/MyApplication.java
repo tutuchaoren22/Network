@@ -1,19 +1,21 @@
 package com.duyuqian.network;
 
 import android.app.Application;
-import android.content.Context;
+
+import androidx.room.Room;
 
 public class MyApplication extends Application {
-    private static Context mContext;
+    public LocalDataSource localDataSource;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        mContext = getApplicationContext();
+        localDataSource = Room.databaseBuilder(getApplicationContext(),
+                LocalDataSource.class, "dataBase")
+                .build();
     }
 
-    public static Context getInstance() {
-        return mContext;
-}
-
+    public LocalDataSource getLocalDataSource() {
+        return localDataSource;
+    }
 }

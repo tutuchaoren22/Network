@@ -1,11 +1,8 @@
 package com.duyuqian.network;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.room.Room;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -36,9 +33,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
-        AsyncTask.execute(() ->
-                getDataFromDataBase());
     }
 
 
@@ -48,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public Wrapper getDataFromURL(String url) {
+    public void getDataFromURL(String url) {
         request = new Request.Builder()
                 .url(url)
                 .build();
@@ -65,21 +59,17 @@ public class MainActivity extends AppCompatActivity {
                         if (response.isSuccessful()) {
                             final String result = response.body().string();
                             wrapper = gson.fromJson(result, Wrapper.class);
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (wrapper.getData().size() > 0) {
-                                        showToast(toast, wrapper.getData().get(0).getName());
-                                    }
-
+                            updateDataBase();
+                            runOnUiThread(() -> {
+                                if (wrapper.getData().size() > 0) {
+                                    showToast(toast, wrapper.getData().get(0).getName());
                                 }
+
                             });
                         }
                     }
                 }
         );
-        return wrapper;
     }
 
     public void showToast(Toast toast, String content) {
@@ -91,10 +81,10 @@ public class MainActivity extends AppCompatActivity {
         toast.show();
     }
 
-    public void getDataFromDataBase() {
-        LocalDataSource database = Room.databaseBuilder(getApplicationContext(),
-                LocalDataSource.class, "dataBase")
-                .build();
-        List<Person> personList = database.personDao().getAll();
+    public void updateDataBase() {
+        LocalDataSource database = new MyApplication().getLocalDataSource();
+        for (Person person : wrapper.getData()) {
+            database.personDao().insertAll(person);
+        }
     }
 }
