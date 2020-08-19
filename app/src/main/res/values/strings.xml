@@ -3,4 +3,6 @@
     <string name="get_data">Get Data Use OkHttp</string>
     <string name="get_number">Get Number of Launch</string>
     <string name="counts">counts</string>
+    <string name="url">https://twc-android-bootcamp.github.io/fake-data/data/default.json</string>
+
 </resources>

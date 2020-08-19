@@ -12,8 +12,4 @@ public class Wrapper {
     public List<Person> getData() {
         return data;
     }
-
-    public void setData(List<Person> data) {
-        this.data = data;
-    }
 }

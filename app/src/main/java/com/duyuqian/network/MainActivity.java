@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindString;
 import butterknife.ButterKnife;
@@ -25,15 +26,15 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
-    public static String URL = "https://twc-android-bootcamp.github.io/fake-data/data/default.json";
     public static int DEFAULT_VALUE = 0;
-    OkHttpClient okHttpClient = new OkHttpClient();
-    Gson gson = new Gson();
-    Request request;
     Wrapper wrapper;
     SharedPreferences sharedPref;
     LocalDataSource database = new MyApplication().getLocalDataSource();
+    OkHttpClient okHttpClient = new OkHttpClient();
+    Gson gson = new Gson();
 
+    @BindString(R.string.url)
+    String URL;
     @BindString(R.string.counts)
     String countsOfLaunch;
 
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getDataFromURL(String url) {
-        request = new Request.Builder()
+        Request request = new Request.Builder()
                 .url(url)
                 .build();
         Call call = okHttpClient.newCall(request);
@@ -73,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                         if (response.isSuccessful()) {
-                            final String result = response.body().string();
+                            final String result = Objects.requireNonNull(response.body()).string();
                             wrapper = gson.fromJson(result, Wrapper.class);
                             updateDataBase();
                             runOnUiThread(() -> {
