@@ -27,11 +27,11 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
     public static int DEFAULT_VALUE = 0;
-    Wrapper wrapper;
-    SharedPreferences sharedPref;
-    LocalDataSource database = new MyApplication().getLocalDataSource();
-    OkHttpClient okHttpClient = new OkHttpClient();
-    Gson gson = new Gson();
+    private Wrapper wrapper;
+    private SharedPreferences sharedPref;
+    private LocalDataSource database;
+    private OkHttpClient okHttpClient = new OkHttpClient();
+    private Gson gson = new Gson();
 
     @BindString(R.string.url)
     String URL;
@@ -55,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        MyApplication myApp = (MyApplication) getApplication();
+        database = myApp.getLocalDataSource();
         ButterKnife.bind(this);
         updateNumberLaunch(getNumberLaunch() + 1);
     }
@@ -68,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
                 new Callback() {
                     @Override
                     public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                        showToast(e.getMessage());
+                        showNameOfFirstPerson(database.personDao().getAll());
                     }
 
                     @Override
@@ -77,11 +79,7 @@ public class MainActivity extends AppCompatActivity {
                             final String result = Objects.requireNonNull(response.body()).string();
                             wrapper = gson.fromJson(result, Wrapper.class);
                             updateDataBase();
-                            runOnUiThread(() -> {
-                                if (wrapper.getData().size() > 0) {
-                                    showToast(wrapper.getData().get(0).getName());
-                                }
-                            });
+                            showNameOfFirstPerson(wrapper.getData());
                         }
                     }
                 }
@@ -113,6 +111,14 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt(countsOfLaunch, numberOfLaunchApp);
         editor.apply();
+    }
+
+    public void showNameOfFirstPerson(List<Person> personList) {
+        runOnUiThread(() -> {
+            if (personList.size() > 0) {
+                showToast(personList.get(0).getName());
+            }
+        });
     }
 
 }
